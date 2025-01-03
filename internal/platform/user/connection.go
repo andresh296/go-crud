@@ -1,9 +1,10 @@
 package user
 
 import (
-	"github.com/andresh296/go-crud/config"
 	"database/sql"
 	"fmt"
+
+	"github.com/andresh296/go-crud/config"
 
 	_ "github.com/go-sql-driver/mysql"
 )

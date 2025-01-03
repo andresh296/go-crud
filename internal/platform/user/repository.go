@@ -1,8 +1,10 @@
 package user
 
 import (
-	domain "github.com/andresh296/go-crud/internal/domain/user"
 	"database/sql"
+	"strings"
+
+	domain "github.com/andresh296/go-crud/internal/domain/user"
 )
 
 const (
@@ -22,17 +24,18 @@ func NewRepository(db *sql.DB) domain.Repository {
 
 func (r repository) Save(user domain.User) error {
 	userToSave := User{
-		ID: user.ID,
-		Name: user.Name,
-		Age: user.Age,
-		Email: user.Email,
+		ID:       user.ID,
+		Name:     user.Name,
+		Age:      user.Age,
+		Email:    user.Email,
 		Password: user.Password,
 	}
 
 	stmt, err := r.db.Prepare(querySave)
 	if err != nil {
-		return err
+		return domain.ErrUserCannotSave
 	}
+	defer stmt.Close()
 
 	_, err = stmt.Exec(
 		userToSave.ID,
@@ -42,5 +45,14 @@ func (r repository) Save(user domain.User) error {
 		userToSave.Password,
 	)
 
-	return err
+	if err != nil {
+		switch {
+		case strings.Contains(err.Error(), "Duplicate"):
+			return domain.ErrDuplicateUser
+		default:
+			return domain.ErrUserCannotSave
+		}
+	}
+
+	return nil
 }
