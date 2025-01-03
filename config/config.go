@@ -5,8 +5,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-
-	"github.com/andresh296/go-crud/tools/utils"
 )
 
 type Config struct {
@@ -22,22 +20,20 @@ type Database struct {
 }
 
 func Load() Config {
-	root, err := utils.FindModuleRoot()
-	if err != nil {
-		log.Fatal("error read config: ", err)
+	root,err:=os.Getwd()
+	if err != nil{
+		log.Fatal("error read config: ",err)
 	}
 
-	path := filepath.Join(root, "/config/default-config.json")
-	file, err := os.ReadFile(path)
-	if err != nil {
-		log.Fatal("error read config: ", err)
+  path := filepath.Join(root,"../config/default-config.json")
+	file,err:=os.ReadFile(path)
+	if err !=nil{
+	log.Fatal("error,falta config",err)
 	}
-
-	var config Config
-	err = json.Unmarshal(file, &config)
-	if err != nil {
-		log.Fatal("error unmarshal config: ", err)
+	var config Config// con C es estructura
+	err=json.Unmarshal(file,&config)
+	if err !=nil{
+		log.Fatal("error: unmarshal config",err)
 	}
-
 	return config
 }
