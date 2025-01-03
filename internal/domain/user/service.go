@@ -1,12 +1,10 @@
 package user
 
 type Repository interface {
-	GetAll() ([]User, error)
 	Save(user User) error
 }
 
 type Service interface {
-	GetAll() ([]User, error)
 	Save(user User) (User, error)
 }
 
@@ -20,9 +18,7 @@ func NewService(repo Repository) Service {
 	}
 }
 
-func (s service) GetAll() ([]User, error) {
-	return s.repository.GetAll()
-}
+
 
 func (s service) Save(user User) (User, error) {
 	user.setID()
