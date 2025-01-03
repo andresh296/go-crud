@@ -10,7 +10,6 @@ func routing(app *gin.Engine, dependencies *Dependencies) {
 	userService := domain.NewService(dependencies.user)
 	handler := New(userService)
 
-	app.GET("/v1/user", handler.GetAll())
 	app.POST("/v1/user", handler.Save())
 }
 

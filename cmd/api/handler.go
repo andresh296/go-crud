@@ -16,16 +16,6 @@ func New(service domain.Service) *handler {
 		service: service,
 	}
 }
-func (h handler) GetAll() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		users, err := h.service.GetAll()
-		if err != nil {
-			h.HandleError(c, err)
-			return
-		}
-		c.JSON(http.StatusOK, users)
-	}
-}
 
 func (h handler) Save() func(c *gin.Context) {
 	return func(c *gin.Context) {
