@@ -3,7 +3,6 @@ package api
 import (
 	domain "github.com/andresh296/go-crud/internal/domain/user"
 	"fmt"
-	"net/http"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -26,23 +25,21 @@ func (u UserRequest) ToDomain() domain.User {
 
 func (u UserRequest) Validate() error {
 	validate := validator.New()
-
 	err := validate.Struct(u)
 	if err != nil {
 		validateErrors := err.(validator.ValidationErrors)
 		message := ""
+		
 		for _, validateErr := range validateErrors {
 			message += fmt.Sprintf("%s: %s,", validateErr.Field(), validateErr.Error())
 		}
 
-		return ValidationError{
-			Status: http.StatusBadRequest,
-			Message: message,
+		return fmt.Errorf(ErrValidationUser.Error(),message)
+
 		}
+		return nil
 	}
 
-	return nil
-} 
 
 type UserResponse struct {
 	ID string `json:"id"`

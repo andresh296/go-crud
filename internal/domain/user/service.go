@@ -26,13 +26,11 @@ func (s service) GetAll() ([]User, error) {
 
 func (s service) Save(user User) (User, error) {
 	user.setID()
-
 	user.hashPassword()
-
 	err := s.repository.Save(user)
 	if err != nil {
 		return User{}, err
 	}
-	
+
 	return user, nil
 }

@@ -11,6 +11,5 @@ func main() {
 	os.Setenv("PORT", "8081")
 	app := gin.Default()
 	api.Boostrap(app)
-
 	app.Run()
 }
