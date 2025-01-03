@@ -46,7 +46,7 @@ func (h handler) Save() func(c *gin.Context) {
 
 		user, err := h.service.Save(userRequest.ToDomain())
 		if err != nil {
-			c.JSON(http.StatusBadRequest, err)
+			c.JSON(http.StatusBadRequest, err.Error())
 			return
 		}
 
