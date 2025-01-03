@@ -80,7 +80,7 @@ func (r repository) Save(user domain.User) error {
 		case strings.Contains(err.Error(), "Duplicate"):
 			return domain.ErrDuplicateUser
 		default:
-			return domain.ErrNoUserSaved
+			return domain.ErrUserCannotSave
 		}
 	}
 

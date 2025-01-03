@@ -3,12 +3,10 @@ package user
 import (
 	"database/sql"
 	"fmt"
-	"time"
 
 	"github.com/andresh296/go-crud/config"
 
 	_ "github.com/go-sql-driver/mysql"
-
 )
 
 func GetDB(config config.Database) (*sql.DB, error) {
@@ -17,10 +15,6 @@ func GetDB(config config.Database) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	db.SetMaxOpenConns(25)
-    db.SetMaxIdleConns(25)
-    db.SetConnMaxLifetime(5 * time.Minute)
 
 	err = db.Ping()
 	if err != nil {
