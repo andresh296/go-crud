@@ -38,6 +38,12 @@ func (h handler) HandleError(c *gin.Context, err error) {
 			Message: err.Error(),
 		})
 		return
+	case errors.Is(err, domain.ErrDuplicateUser):
+		c.JSON(http.StatusAlreadyReported, WebError{
+			Status: http.StatusAlreadyReported,
+			Message: err.Error(),
+		})
+		return
 	default:
 		c.JSON(http.StatusInternalServerError, WebError{
 			Status: http.StatusInternalServerError,
