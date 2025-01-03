@@ -7,5 +7,4 @@ var (
 	ErrGetUsers       = errors.New("error get users")
 	ErrDuplicateUser  = errors.New("user already exists")
 	ErrSavingUser     = errors.New("error saving user")
-	ErrNoUserSaved    = errors.New("no user was saved")
 )
