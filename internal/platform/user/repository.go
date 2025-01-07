@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	querySave = "INSERT INTO users (id, name, age, email, password) VALUES (?,?,?,?,?)"
+	queryGetByID = "SELECT id, name, age, email, password FROM users WHERE id = ?"
+	querySave    = "INSERT INTO users (id, name, age, email, password) VALUES (?,?,?,?,?)"
 )
 
 type repository struct {
@@ -21,6 +22,25 @@ func NewRepository(db *sql.DB) domain.Repository {
 	}
 }
 
+func (r repository) GetByID(id string) (*domain.User, error) {
+	stmt, err := r.db.Prepare(queryGetByID)
+	if err != nil {
+		return nil, domain.ErrGetUsers
+	}
+	defer stmt.Close()
+
+	var user User
+	err = stmt.QueryRow(id).Scan(&user.ID, &user.Name, &user.Age, &user.Email, &user.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, domain.ErrGetUsers
+		}
+		return nil, domain.ErrGetUsers
+	}
+	userDomain := user.ToDomain()
+	return &userDomain, nil
+
+}
 
 func (r repository) Save(user domain.User) error {
 	userToSave := User{
