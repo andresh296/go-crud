@@ -14,11 +14,11 @@ type Config struct {
 }
 
 type Database struct {
-	Driver string `json:"driver"`
-	Host string `json:"host"`
+	Driver   string `json:"driver"`
+	Host     string `json:"host"`
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Schema string `json:"schema"`
+	Schema   string `json:"schema"`
 }
 
 func Load() Config {

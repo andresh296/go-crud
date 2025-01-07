@@ -11,6 +11,7 @@ func routing(app *gin.Engine, dependencies *Dependencies) {
 	handler := New(userService)
 
 	app.POST("/v1/user", handler.Save())
+	app.GET("/v1/user/:email",handler.GetByEmail())
 }
 
 func Boostrap(app *gin.Engine) {

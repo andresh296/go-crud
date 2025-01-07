@@ -7,4 +7,5 @@ var (
 	ErrGetUsers       = errors.New("error get users")
 	ErrDuplicateUser  = errors.New("user already exists")
 	ErrSavingUser     = errors.New("error saving user")
+	ErrGettingEmail    =errors.New("error getting the email")
 )
