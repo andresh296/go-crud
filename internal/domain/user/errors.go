@@ -3,8 +3,10 @@ package user
 import "errors"
 
 var (
-	ErrUserCannotSave = errors.New("error user can not save")
-	ErrGetUsers       = errors.New("error get users")
-	ErrDuplicateUser  = errors.New("user already exists")
-	ErrSavingUser     = errors.New("error saving user")
+	ErrUserCannotSave  = errors.New("error user can not save")
+	ErrGetUsers        = errors.New("error get users")
+	ErrDuplicateUser   = errors.New("user already exists")
+	ErrSavingUser      = errors.New("error saving user")
+	ErrUserCannotGet     = errors.New("error can not get user")
+	ErrUserCannotFound = errors.New("error can no found user")
 )

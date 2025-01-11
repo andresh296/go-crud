@@ -1,0 +1,36 @@
+# Binarios / ejecutables
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Binary files
+*_bin*
+debug_bin*
+debug
+/debug
+
+# Nombre de tu directorio
+GO-CRUD
+
+# Archivos temporales
+*.test
+*.out
+tmp/
+
+# IDE específicos
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Dependencias
+vendor/
+
+# Archivos de log
+*.log
+
+# Archivos de configuración local
+.env
+.env.local
