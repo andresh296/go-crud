@@ -20,7 +20,7 @@ func New(service domain.Service) *handler {
 
 func (h handler) GetByID() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		id := c.Param("id") 
+		id := c.Param("id")
 
 		user, err := h.service.GetByID(id)
 		if err != nil {

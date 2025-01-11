@@ -39,7 +39,7 @@ func (r repository) GetByID(id string) (*domain.User, error) {
 		if err == sql.ErrNoRows {
 			return nil, domain.ErrUserCannotFound
 		}
-		return nil, domain.ErrUserCannotFound
+		return nil, domain.ErrUserCannotGet
 	}
 	userDomain := user.ToDomain()
 	return &userDomain, nil
