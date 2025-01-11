@@ -9,12 +9,12 @@ import (
 )
 
 var (
-	ErrUnmarshalBody = errors.New("error unmarshal request body")
+	ErrUnmarshalBody  = errors.New("error unmarshal request body")
 	ErrValidationUser = errors.New("error validation user: %w")
 )
 
 type WebError struct {
-	Status int `json:"status"`
+	Status  int    `json:"status"`
 	Message string `json:"message"`
 }
 
@@ -22,46 +22,45 @@ func (h handler) HandleError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, ErrUnmarshalBody):
 		c.JSON(http.StatusBadRequest, WebError{
-			Status: http.StatusBadRequest,
+			Status:  http.StatusBadRequest,
 			Message: err.Error(),
 		})
 		return
 	case errors.Is(err, ErrValidationUser):
 		c.JSON(http.StatusBadRequest, WebError{
-			Status: http.StatusBadRequest,
+			Status:  http.StatusBadRequest,
 			Message: err.Error(),
 		})
 		return
 	case errors.Is(err, domain.ErrUserCannotSave):
 		c.JSON(http.StatusFailedDependency, WebError{
-			Status: http.StatusFailedDependency,
+			Status:  http.StatusFailedDependency,
 			Message: err.Error(),
 		})
 		return
 	case errors.Is(err, domain.ErrDuplicateUser):
 		c.JSON(http.StatusAlreadyReported, WebError{
-			Status: http.StatusAlreadyReported,
+			Status:  http.StatusAlreadyReported,
 			Message: err.Error(),
 		})
 		return
 	case errors.Is(err, domain.ErrGettingUserByEmail):
 		c.JSON(http.StatusAlreadyReported, WebError{
-			Status: http.StatusNotFound,
+			Status:  http.StatusFailedDependency,
 			Message: err.Error(),
 		})
 		return
 	case errors.Is(err, domain.ErrNotFoundUserByEmail):
 		c.JSON(http.StatusAlreadyReported, WebError{
-			Status: http.StatusFailedDependency,
+			Status:  http.StatusNotFound,
 			Message: err.Error(),
 		})
 		return
 	default:
 		c.JSON(http.StatusInternalServerError, WebError{
-			Status: http.StatusInternalServerError,
+			Status:  http.StatusInternalServerError,
 			Message: err.Error(),
 		})
 		return
 	}
 }
-
