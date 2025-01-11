@@ -22,10 +22,10 @@ func NewRepository(db *sql.DB) domain.Repository {
 	}
 }
 
-func (r *repository) GetByEmail(email string) (*domain.User, error) {
+func (r *repository) GetUserByEmail(email string) (*domain.User, error) {
 	stmt, err := r.db.Prepare(QueryByEmail)
 	if err != nil {
-		return nil, domain.ErrGettingEmail
+		return nil, domain.ErrGettingUserByEmail
 	}
 	defer stmt.Close()
 
@@ -33,9 +33,9 @@ func (r *repository) GetByEmail(email string) (*domain.User, error) {
 	err = stmt.QueryRow(email).Scan(&user.ID, &user.Name, &user.Age, &user.Email, &user.Password)
 	if err != nil { // Primero verificamos si hay error
 		if err == sql.ErrNoRows { // Si es error de no encontrado
-			return nil, domain.ErrGettingEmail
+			return nil, domain.ErrGettingUserByEmail
 		}
-		return nil, domain.ErrGettingEmail // Si es otro tipo de error
+		return nil, domain.ErrGettingUserByEmail // Si es otro tipo de error
 	}
 
 	usersDomain := user.ToDomain()

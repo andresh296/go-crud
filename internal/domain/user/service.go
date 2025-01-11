@@ -1,12 +1,12 @@
 package user
 
 type Repository interface {
-	GetByEmail(email string) (*User,error)
+	GetUserByEmail(email string) (*User,error)
 	Save(user User) error
 }
 
 type Service interface {
-	GetByEmail(email string) (*User,error)
+	GetUserByEmail(email string) (*User,error)
 	Save(user User) (User, error)
 }
 
@@ -20,8 +20,8 @@ func NewService(repo Repository) Service {
 	}
 }
 
-func (s service)GetByEmail(email string) (*User,error){
-	return s.repository.GetByEmail(email)
+func (s service)GetUserByEmail(email string) (*User,error){
+	return s.repository.GetUserByEmail(email)
 }
 
 
