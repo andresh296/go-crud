@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	queryGetByID = "SELECT id, name, age, email, password FROM users WHERE id = ?"
+	queryGetByID = "SELECT id, name, age, email FROM users WHERE id = ?"
 	querySave    = "INSERT INTO users (id, name, age, email, password) VALUES (?,?,?,?,?)"
 )
 
@@ -30,12 +30,16 @@ func (r repository) GetByID(id string) (*domain.User, error) {
 	defer stmt.Close()
 
 	var user User
-	err = stmt.QueryRow(id).Scan(&user.ID, &user.Name, &user.Age, &user.Email, &user.Password)
+	err = stmt.QueryRow(id).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Age,
+		&user.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, domain.ErrGetUsers
+			return nil, domain.ErrUserCannotFound
 		}
-		return nil, domain.ErrGetUsers
+		return nil, domain.ErrUserCannotFound
 	}
 	userDomain := user.ToDomain()
 	return &userDomain, nil
