@@ -18,6 +18,21 @@ func New(service domain.Service) *handler {
 	}
 }
 
+
+func (h handler) GetUserByEmail() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		email:=c.Param("email")
+
+		user, err := h.service.GetUserByEmail(email) // Usa una función del servicio para obtener el usuario por su email
+		if err != nil {
+			h.HandleError(c, err)
+			return
+		}
+
+		c.JSON(http.StatusOK, user)
+	}
+}
+
 func (h handler) GetByID() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		id := c.Param("id")

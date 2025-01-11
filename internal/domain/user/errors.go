@@ -9,4 +9,6 @@ var (
 	ErrSavingUser      = errors.New("error saving user")
 	ErrUserCannotGet     = errors.New("error can not get user")
 	ErrUserCannotFound = errors.New("error can no found user")
+	ErrGettingUserByEmail = errors.New("error getting user by the email")
+	ErrNotFoundUserByEmail=errors.New("error not found user by email")
 )

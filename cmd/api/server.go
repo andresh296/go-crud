@@ -12,6 +12,7 @@ func routing(app *gin.Engine, dependencies *Dependencies) {
 
 	app.GET("/v1/user/id/:id", handler.GetByID())
 	app.POST("/v1/user", handler.Save())
+	app.GET("/v1/user/email/:email", handler.GetUserByEmail())
 }
 
 func Boostrap(app *gin.Engine) {

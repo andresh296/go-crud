@@ -44,6 +44,18 @@ func (h handler) HandleError(c *gin.Context, err error) {
 			Message: err.Error(),
 		})
 		return
+	case errors.Is(err, domain.ErrGettingUserByEmail):
+		c.JSON(http.StatusAlreadyReported, WebError{
+			Status:  http.StatusFailedDependency,
+			Message: err.Error(),
+		})
+		return
+	case errors.Is(err, domain.ErrNotFoundUserByEmail):
+		c.JSON(http.StatusAlreadyReported, WebError{
+			Status:  http.StatusNotFound,
+			Message: err.Error(),
+		})
+		return
 	case errors.Is(err, domain.ErrUserCannotFound):
 		c.JSON(http.StatusNotFound, WebError{
 			Status:  http.StatusNotFound,
