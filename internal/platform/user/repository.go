@@ -9,6 +9,7 @@ import (
 
 const (
 	QueryByEmail = "SELECT id, name, age, email,password FROM users WHERE email = ?"
+	queryGetByID = "SELECT id, name, age, email FROM users WHERE id = ?"
 	querySave    = "INSERT INTO users (id, name, age, email, password) VALUES (?,?,?,?,?)"
 )
 
@@ -33,13 +34,37 @@ func (r *repository) GetUserByEmail(email string) (*domain.User, error) {
 	err = stmt.QueryRow(email).Scan(&user.ID, &user.Name, &user.Age, &user.Email, &user.Password)
 	if err != nil { // Primero verificamos si hay error
 		if err == sql.ErrNoRows { // Si es error de no encontrado
-			return nil, domain.ErrGettingUserByEmail
+			return nil, domain.ErrNotFoundUserByEmail
 		}
 		return nil, domain.ErrGettingUserByEmail // Si es otro tipo de error
 	}
 
 	usersDomain := user.ToDomain()
 	return &usersDomain, nil
+}
+
+func (r repository) GetByID(id string) (*domain.User, error) {
+	stmt, err := r.db.Prepare(queryGetByID)
+	if err != nil {
+		return nil, domain.ErrGetUsers
+	}
+	defer stmt.Close()
+
+	var user User
+	err = stmt.QueryRow(id).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Age,
+		&user.Email)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, domain.ErrUserCannotFound
+		}
+		return nil, domain.ErrUserCannotGet
+	}
+	userDomain := user.ToDomain()
+	return &userDomain, nil
+
 }
 
 func (r repository) Save(user domain.User) error {
