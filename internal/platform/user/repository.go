@@ -7,6 +7,8 @@ import (
 	domain "github.com/andresh296/go-crud/internal/domain/user"
 )
 
+
+
 const (
 	QueryByEmail = "SELECT id, name, age, email,password FROM users WHERE email = ?"
 	queryGetByID = "SELECT id, name, age, email FROM users WHERE id = ?"
