@@ -4,8 +4,7 @@
 name:  Coverage Check Go
 
 on:
-  push:
-    branches: [ "develop" ]
+
   pull_request:
     branches: [ "develop" ]
 
