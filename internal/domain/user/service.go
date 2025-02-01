@@ -2,13 +2,13 @@ package user
 
 type Repository interface {
 	GetByID(id string) (*User, error)
-	GetUserByEmail(email string) (*User,error)
+	GetUserByEmail(email string) (*User, error)
 	Save(user User) error
 }
 
 type Service interface {
 	GetByID(id string) (*User, error)
-	GetUserByEmail(email string) (*User,error)
+	GetUserByEmail(email string) (*User, error)
 	Save(user User) (User, error)
 }
 
@@ -26,7 +26,7 @@ func (s service) GetByID(id string) (*User, error) {
 	return s.repository.GetByID(id)
 }
 
-func (s service)GetUserByEmail(email string) (*User,error){
+func (s service) GetUserByEmail(email string) (*User, error) {
 	return s.repository.GetUserByEmail(email)
 }
 
@@ -40,3 +40,5 @@ func (s service) Save(user User) (User, error) {
 
 	return user, nil
 }
+
+
