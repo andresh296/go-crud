@@ -51,7 +51,7 @@ func (h handler) HandleError(c *gin.Context, err error) {
 		})
 		return
 	case errors.Is(err, domain.ErrNotFoundUserByEmail):
-		c.JSON(http.StatusAlreadyReported, WebError{
+		c.JSON(http.StatusNotFound, WebError{
 			Status:  http.StatusNotFound,
 			Message: err.Error(),
 		})
