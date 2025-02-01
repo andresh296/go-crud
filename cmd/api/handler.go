@@ -77,3 +77,37 @@ func (h handler) Save() func(c *gin.Context) {
 		c.JSON(http.StatusCreated, response)
 	}
 }
+
+
+func (h handler) Login() func(c *gin.Context) {	
+	return func(c *gin.Context) {
+		var UserLogin UserLogin
+		err := c.BindJSON(&UserLogin)
+		if err != nil {
+			h.HandleError(c, ErrUnmarshalBody)
+			return
+		}
+
+		err = UserLogin.Validate()
+		if err != nil {
+			h.HandleError(c, err)
+			return 
+		}
+
+		user, err := h.service.Login(UserLogin.ToDomain())
+		if err != nil {
+			h.HandleError(c, err)
+			return
+		}
+
+		
+
+		response := UserResponse{
+			ID:    user.ID,
+			Name:  user.Name,
+			Age:   user.Age,
+			Email: user.Email,
+		}
+		c.JSON(http.StatusOK, response)
+	}
+}
