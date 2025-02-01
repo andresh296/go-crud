@@ -4,13 +4,11 @@
 name:  Coverage Check Go
 
 on:
+  push:
+   branches: ["champion19-patch-1"]
 
   pull_request:
-    - develop
-    - champion19-patch-1
-    - feature/repository_test
-    - feature/example
-    - master
+    branches: [ "champion19-patch-1" ]
 
 jobs:
   test-coverage:
