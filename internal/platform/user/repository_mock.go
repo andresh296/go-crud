@@ -12,6 +12,3 @@ type MockDB struct {
 	Mock sqlmock.Sqlmock
 }
 
-func (m *MockDB) Close() {
-	m.DB.Close()
-}
