@@ -4,11 +4,12 @@
 name:  Coverage Check Go
 
 on:
+
   push:
    branches: ["champion19-patch-1"]
 
   pull_request:
-    branches: [ "champion19-patch-1" ]
+    workflow_dispatch:
 
 jobs:
   test-coverage:
