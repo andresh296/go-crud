@@ -10,19 +10,30 @@ on:
     branches: [ "develop" ]
 
 jobs:
+  test-coverage:
+      name: Run test and check coverage
+      runs-on: ubuntu-latest
 
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
         go-version: '1.20'
 
-    - name: Build
-      run: go build -v ./...
+      - name: Install dependencies
+        run: go mod tidy
 
-    - name: Test
-      run: go test -v ./...
+      - name: Run tests with coverage
+        run: go test ./... -coverprofile=coverage.out -covermode=atomic
+
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.out | awk '/total:/ {print $3}' | sed 's/%//')
+          echo "Coverage: $COVERAGE%"
+          if (( $(echo "$COVERAGE < 90" | bc -l) )); then
+            echo "❌ Coverage is below 90%. Required: 90%, Found: $COVERAGE%"
+            exit 1
+          fi
