@@ -6,7 +6,11 @@ name:  Coverage Check Go
 on:
 
   pull_request:
-    
+    - develop
+    - champion19-patch-1
+    - feature/repository_test
+    - feature/example
+    - master
 
 jobs:
   test-coverage:
