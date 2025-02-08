@@ -8,11 +8,12 @@ import (
 
 func routing(app *gin.Engine, dependencies *Dependencies) {
 	userService := domain.NewService(dependencies.user)
-	handler := New(userService)
+	handler := New(userService, dependencies.config)
 
 	app.GET("/v1/user/id/:id", handler.GetByID())
 	app.POST("/v1/user", handler.Save())
 	app.GET("/v1/user/email/:email", handler.GetUserByEmail())
+	app.POST("/v1/user/login", handler.Login())
 }
 
 func Boostrap(app *gin.Engine) {

@@ -7,7 +7,8 @@ import (
 )
 
 type Dependencies struct {
-	user domain.Repository
+	user   domain.Repository
+	config *config.Config
 }
 
 func initDependencies() *Dependencies {

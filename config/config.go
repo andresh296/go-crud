@@ -5,12 +5,14 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/andresh296/go-crud/tools/utils"
 )
 
 type Config struct {
-	Database Database `json:"database"`
+	Database Database  `json:"database"`
+	JWT      JWTConfig `json:"jwt"`
 }
 
 type Database struct {
@@ -40,4 +42,9 @@ func Load() Config {
 	}
 
 	return config
+}
+
+type JWTConfig struct {
+	SecretKey      string        `json:"jwt_secret_key" : "mi_super_secreto_32_caracteres"`
+	ExpirationTime time.Duration `json:"jwt_expiration_time" : "1h"`
 }
