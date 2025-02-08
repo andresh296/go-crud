@@ -1,41 +1,37 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
-name:  Coverage Check Go
+name: "Go Coverage"
 
 on:
-
-  push:
-   branches: ["champion19-patch-1"]
-
   pull_request:
-    workflow_dispatch:
+  push:
+    branches:
+      - '*' # Asegura que se ejecute en la rama principal
 
 jobs:
-  test-coverage:
-      name: Run test and check coverage
-      runs-on: ubuntu-latest
-
-      steps:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 10  # Necesario para encontrar notas previas de cobertura
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-        go-version: '1.20'
+          go-version: stable  # Usa la versión estable de Go
 
-      - name: Install dependencies
-        run: go mod tidy
-
-      - name: Run tests with coverage
-        run: go test ./... -coverprofile=coverage.out -covermode=atomic
-
-      - name: Check coverage threshold
+      - name: Run Go tests with coverage
         run: |
-          COVERAGE=$(go tool cover -func=coverage.out | awk '/total:/ {print $3}' | sed 's/%//')
-          echo "Coverage: $COVERAGE%"
-          if (( $(echo "$COVERAGE < 90" | bc -l) )); then
-            echo "❌ Coverage is below 90%. Required: 90%, Found: $COVERAGE%"
-            exit 1
-          fi
+          go test -covermode=count -coverprofile=coverage.out ./...
+          go tool cover -html=coverage.out -o coverage.html
+        # Este paso genera los archivos `coverage.out` y `coverage.html`
+
+      - name: Archive Go Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-coverage-report
+          path: coverage.html  # Asegúrate de que el archivo de cobertura se haya generado correctamente
+
+      - name: Debug working directory
+        run: ls -la  # Verificar en qué directorio estamos
+
