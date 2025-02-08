@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 10 # Necesario para encontrar notas previas de cobertura
-    
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -30,17 +30,17 @@ jobs:
 
       - name: Vet
         run: |
-        go vet ./...      
+         go vet ./...
 
-     - name: Unit tests
-       run: |
+      - name: Unit tests
+        run: |
             sudo go test ./... -coverprofile coverage.out -covermode count
             sudo go tool cover -func coverage.out
 
-     - name: Quality Gate - Test coverage shall be above threshold
-       env:
+      - name: Quality Gate - Test coverage shall be above threshold
+        env:
           TESTCOVERAGE_THRESHOLD: 90
-       run: |
+        run: |
              echo "Quality Gate: checking test coverage is above threshold ..."
              echo "Threshold             : $TESTCOVERAGE_THRESHOLD %"
              totalCoverage=`go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+'`
@@ -51,7 +51,7 @@ jobs:
                 echo "Current test coverage is below threshold. Please add more unit tests or adjust threshold to a lower value."
                 echo "Failed"
                 exit 1
-             fi     
+             fi
 
-    - name: Debug working directory
+      - name: Debug working directory
         run: ls -la  # Verificar en qué directorio estamos
