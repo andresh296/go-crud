@@ -52,7 +52,11 @@ jobs:
                 echo "Failed"
                 exit 1
              fi
-
+             
+      - name: name: Use secret token (example)
+        run: |
+          echo "Using secret token: ${{ secrets.FLOW }}"
+          
       - name: Debug working directory
         run: ls -la  # Verificar en qué directorio estamos
 
