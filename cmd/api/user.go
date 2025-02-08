@@ -20,6 +20,15 @@ type UserLogin struct {
 	Password string `json:"password" validate:"required,min=8"`
 }
 
+type LoginResponse struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Age   int8   `json:"age"`
+	Email string `json:"email"`
+	Token string `json:"token"`
+
+}
+
 type UserResponse struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
@@ -31,6 +40,13 @@ func (u UserRequest) ToDomain() domain.User {
 	return domain.User{
 		Name:     u.Name,
 		Age:      u.Age,
+		Email:    u.Email,
+		Password: u.Password,
+	}
+}
+
+func (u UserLogin) ToDomain() domain.User {
+	return domain.User{
 		Email:    u.Email,
 		Password: u.Password,
 	}
@@ -52,12 +68,7 @@ func (u UserRequest) Validate() error {
 	return nil
 }
 
-func (u UserLogin) ToDomain() domain.User {
-	return domain.User{
-		Email:    u.Email,
-		Password: u.Password,
-	}
-}
+
 
 func (u UserLogin) Validate() error {
 	validate := validator.New()

@@ -62,7 +62,7 @@ func TestGetUserByEmail_ErrorNotFound(t *testing.T) {
 
 	service := NewService(mockRepo)
 	_, err := service.GetUserByEmail("email@test")
-	
+
 	assert.Equal(t, ErrNotFoundUserByEmail, err)
 }
 
