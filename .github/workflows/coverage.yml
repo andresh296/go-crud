@@ -1,0 +1,41 @@
+name: Go Coverage Check
+
+on:
+  pull_request:
+    branches:
+      - '*'  # Esto ejecutará la acción en cualquier pull request hacia cualquier rama
+
+jobs:
+  check-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso 1: Check out el código
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      # Paso 2: Configurar Go
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.20'  # O la versión de Go que uses
+
+      # Paso 3: Instalar dependencias
+      - name: Install dependencies
+        run: go mod tidy
+
+      # Paso 4: Ejecutar tests y generar el informe de coverage
+      - name: Run tests with coverage
+        run: |
+          mkdir -p coverage
+          go test -coverprofile=coverage/profile.cov ./...
+        
+      # Paso 5: Verificar si el coverage es mayor o igual a 80%
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(go tool cover -func=coverage/profile.cov | grep total | awk '{print $3}' | sed 's/%//')
+          echo "Coverage is $COVERAGE%"
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "Coverage is below 80%. Merge is not allowed."
+            exit 1
+          fi
