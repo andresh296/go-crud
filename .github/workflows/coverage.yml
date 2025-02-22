@@ -1,0 +1,48 @@
+name: "Go Coverage"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - '**/*.md' # Asegura que se ejecute en la rama principal
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 10 # Necesario para encontrar notas previas de cobertura
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.20  # Usa la versión estable de Go
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Lint
+        run: |
+         golint -set_exit_status ./...
+      - name: Vet
+        run: |
+         go vet ./...
+      - name: Unit tests
+        run: |
+            sudo go test ./... -coverprofile coverage.out -covermode count
+            sudo go tool cover -func coverage.out
+      - name: Quality Gate - Test coverage shall be above threshold
+        env:
+          TESTCOVERAGE_THRESHOLD: 90
+        run: |
+             echo "Quality Gate: checking test coverage is above threshold ..."
+             echo "Threshold             : $TESTCOVERAGE_THRESHOLD %"
+             totalCoverage=`go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+'`
+             echo "Current test coverage : $totalCoverage %"
+             if (( $(echo "$totalCoverage $TESTCOVERAGE_THRESHOLD" | awk '{print ($1 > $2)}') )); then
+                echo "OK"
+             else
+                echo "Current test coverage is below threshold. Please add more unit tests or adjust threshold to a lower value."
+                echo "Failed"
+                exit 1
+             fi
