@@ -13,7 +13,7 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(ID,Email, SecretKey string, expiration time.Duration ) (string, error) {
+func GenerateJWT(ID, Email, SecretKey string, expiration time.Duration) (string, error) {
 
 	claims := &Claims{
 		ID:    ID,
@@ -32,13 +32,16 @@ func GenerateJWT(ID,Email, SecretKey string, expiration time.Duration ) (string,
 }
 
 func ValidateJWT(tokenString, secretKey string) (*Claims, error) {
-    token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-        return []byte(secretKey), nil
-    })
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secretKey), nil
+	})
+	if err != nil {
+		return nil, err
+	}
 
-    if claims, ok := token.Claims.(*Claims); ok && token.Valid {
-        return claims, nil
-    }
-    
-    return nil, err
+	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+		return claims, nil
+	}
+
+	return nil, jwt.ErrTokenInvalidClaims
 }

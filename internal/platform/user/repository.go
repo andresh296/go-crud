@@ -34,11 +34,11 @@ func (r *repository) GetUserByEmail(email string) (*domain.User, error) {
 
 	var user User
 	err = stmt.QueryRow(email).Scan(&user.ID, &user.Name, &user.Age, &user.Email, &user.Password)
-	if err != nil { // Primero verificamos si hay error
-		if err == sql.ErrNoRows { // Si es error de no encontrado
+	if err != nil { 
+		if err == sql.ErrNoRows { 
 			return nil, domain.ErrNotFoundUserByEmail
 		}
-		return nil, domain.ErrGettingUserByEmail // Si es otro tipo de error
+		return nil, domain.ErrGettingUserByEmail 
 	}
 
 	usersDomain := user.ToDomain()

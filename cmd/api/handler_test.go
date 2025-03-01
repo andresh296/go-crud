@@ -125,8 +125,7 @@ func TestLogin_Success(t *testing.T) {
 		Email:    "test@email.com",
 		Password: "testpassword",
 	}
-
-	mockservice.On("Login", expecteduser).Return("test@email.com", nil)
+	mockservice.On("Login", expecteduser).Return(expecteduser, "test-token", nil)
 
 	jsonBody := []byte(`{"email": "test@email.com", "password": "testpassword"}`)
 
@@ -150,5 +149,41 @@ func TestLogin_Success(t *testing.T) {
 	if err := json.Unmarshal(w.Body.Bytes(), &response); err != nil {
 		t.Fatal("Error al parsear la respuesta:", err)
 	}
-	assert.Equal(t, expecteduser.Email, response["email"])
+	assert.Equal(t, "test@email.com", response["email"])
+	assert.Equal(t, "test-token", response["token"])
+}
+
+func TestLogin_Error(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockservice := new(MockService)
+	cfg := &config.Config{
+		JWT: config.JWTConfig{
+			SecretKey:      "test-secret",
+			ExpirationTime: 3600,
+		},
+	}
+	handler := New(mockservice, cfg)
+
+	expecteduser := &domain.User{
+		Email:    "test@email.com",
+		Password: "testpassword",
+	}
+	mockservice.On("Login", expecteduser).Return(nil, "", domain.ErrUserCannotFound)
+
+	jsonBody := []byte(`{"email": "test@email.com", "password": "testpassword"}`)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)	
+
+	req, err := http.NewRequest("POST", "/v1/user/login", io.NopCloser(bytes.NewBuffer(jsonBody)))
+	if err != nil {
+		t.Fatal(err)
+	}		
+	req.Header.Set("Content-Type", "application/json")
+
+	c.Request = req
+
+	handler.Login()(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
 }

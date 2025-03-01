@@ -5,7 +5,6 @@ import (
 
 	"github.com/andresh296/go-crud/config"
 	domain "github.com/andresh296/go-crud/internal/domain/user"
-	"github.com/andresh296/go-crud/internal/platform/security"
 
 	"github.com/gin-gonic/gin"
 )
@@ -83,33 +82,20 @@ func (h handler) Save() func(c *gin.Context) {
 
 func (h handler) Login() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		var UserLogin UserLogin
-		err := c.BindJSON(UserLogin)
+		var userLogin UserLogin
+		err := c.BindJSON(&userLogin)
 		if err != nil {
 			h.HandleError(c, ErrUnmarshalBody)
 			return
 		}
 
-		err = UserLogin.Validate()
+		err = userLogin.Validate()
 		if err != nil {
 			h.HandleError(c, err)
 			return
 		}
 
-		user, err := h.service.Login(UserLogin.ToDomain())
-		if err != nil {
-			h.HandleError(c, err)
-			return
-		}
-
-		// Generar JWT
-		token, err := security.GenerateJWT(
-			user.ID,
-			user.Email,
-			h.cfg.JWT.SecretKey,
-			h.cfg.JWT.ExpirationTime,
-		)
-
+		user, token, err := h.service.Login(userLogin.ToDomain())
 		if err != nil {
 			h.HandleError(c, err)
 			return
@@ -117,6 +103,8 @@ func (h handler) Login() func(c *gin.Context) {
 
 		response := LoginResponse{
 			ID:    user.ID,
+			Name:  user.Name,
+			Age:   user.Age,
 			Email: user.Email,
 			Token: token,
 		}
