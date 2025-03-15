@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/andresh296/go-crud/config"
-	"github.com/andresh296/go-crud/internal/platform/security"
+	"github.com/andresh296/go-crud/internal/platform/token"
 	"golang.org/x/crypto/bcrypt"
 )
 

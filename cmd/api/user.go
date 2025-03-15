@@ -64,7 +64,7 @@ func (u UserRequest) Validate() error {
 			message += fmt.Sprintf("%s: %s,", validateErr.Field(), validateErr.Error())
 		}
 
-		return fmt.Errorf(ErrValidationUser.Error(), message)
+		return fmt.Errorf("%w: %s", ErrValidationUser, message)
 	}
 	return nil
 }

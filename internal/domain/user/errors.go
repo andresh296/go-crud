@@ -12,4 +12,6 @@ var (
 	ErrGettingUserByEmail  = errors.New("error getting user by the email")
 	ErrNotFoundUserByEmail = errors.New("error not found user by email")
 	ErrUserCannotLogin     = errors.New("error user can not login")
+	ErrValidationUser      = errors.New("error validation user")
+	ErrInvalidJson         = errors.New("error invalid json")
 )

@@ -28,6 +28,6 @@ func (m *MockService) GetUserByEmail(email string) (*domain.User, error) {
 }
 
 func (m *MockService) Save(user domain.User) (domain.User, error) {
-	args := m.Called(user)
-	return args.Get(0).(domain.User), args.Error(1)
+    args := m.Called(user)
+    return args.Get(0).(domain.User), args.Error(1)
 }

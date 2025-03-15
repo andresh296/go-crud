@@ -8,7 +8,6 @@ import (
 
 type Dependencies struct {
     userRepo   user.Repository
-    userService user.Service
     config     *config.Config
 
 }
@@ -24,12 +23,9 @@ func initDependencies() *Dependencies {
     userRepo := repo.NewRepository(db)
 
     
-   
-    userService := user.NewService(userRepo)
 
     return &Dependencies{
         userRepo:   userRepo,
-        userService: userService,
         config:     &cfg,
     }
 }

@@ -3,7 +3,6 @@ package api
 import (
 	"net/http"
 
-	"github.com/andresh296/go-crud/config"
 	domain "github.com/andresh296/go-crud/internal/domain/user"
 
 	"github.com/gin-gonic/gin"
@@ -11,13 +10,11 @@ import (
 
 type handler struct {
 	service domain.Service
-	cfg     *config.Config
 }
 
-func New(service domain.Service, cfg *config.Config) *handler {
+func New(service domain.Service) *handler {
 	return &handler{
 		service: service,
-		cfg:     cfg,
 	}
 }
 
@@ -60,7 +57,7 @@ func (h handler) Save() func(c *gin.Context) {
 
 		err = userRequest.Validate()
 		if err != nil {
-			h.HandleError(c, err)
+			h.HandleError(c, ErrValidationUser)
 			return
 		}
 
@@ -91,7 +88,7 @@ func (h handler) Login() func(c *gin.Context) {
 
 		err = userLogin.Validate()
 		if err != nil {
-			h.HandleError(c, err)
+			h.HandleError(c, ErrValidationUser)
 			return
 		}
 

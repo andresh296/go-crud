@@ -5,7 +5,7 @@ import (
     "net/http"
 
     "github.com/andresh296/go-crud/config"
-    "github.com/andresh296/go-crud/internal/platform/security"
+    "github.com/andresh296/go-crud/internal/platform/token"
     "github.com/gin-gonic/gin"
 )
 

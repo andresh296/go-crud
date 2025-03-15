@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/andresh296/go-crud/config"
-	"github.com/andresh296/go-crud/internal/platform/security"
+	"github.com/andresh296/go-crud/internal/platform/token"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
@@ -49,7 +49,7 @@ func TestJWTAuthMiddleware_VerifyClaimsInContext(t *testing.T) {
         SecretKey: "test-secret-key",
     }
 
-    // Crear token con claims específicos
+
     id := "123"
     email := "test@example.com"
 

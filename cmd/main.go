@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/andresh296/go-crud/cmd/api"
 	"os"
+
+	"github.com/andresh296/go-crud/cmd/api"
 
 	"github.com/gin-gonic/gin"
 )

@@ -64,7 +64,7 @@ func TestGetUseByID_Succes(t *testing.T) {
 
 	repo := NewRepository(db)
 
-	// Configurar el comportamiento esperado del mock
+
 	rows := mockDB.NewRows([]string{"id", "name", "age", "email"}).
 		AddRow("123", "Esteban", 25, "estebanpoly@gmail.com")
 
