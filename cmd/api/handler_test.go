@@ -1,6 +1,9 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -56,7 +59,7 @@ func TestGetUserByEmail_Succes(t *testing.T) {
 func TestGetUserByID_Succes(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockservice := new(MockService)
-	handler := New(mockservice)
+	handler := New(mockservice,)
 
 	expecteduser := &domain.User{
 		ID:    "1238",
@@ -73,6 +76,109 @@ func TestGetUserByID_Succes(t *testing.T) {
 	handler.GetByID()(c)
 
 	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestSaveUser_Success(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockservice := new(MockService)
+	handler := New(mockservice)
+	expectedUser := domain.User{
+		Name:     "testemail",
+		Email:    "test@email.com",
+		Age:      20,
+		Password: "12345678",
+	}
+
+	mockservice.On("Save", expectedUser).Return(expectedUser, nil)
+
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+
+	jsonBody := []byte(`{"name":"testemail","email":"test@email.com","age":20,"password":"12345678"}`)
+	c.Request, _ = http.NewRequest(http.MethodPost, "/v1/user", bytes.NewBuffer(jsonBody))
+	c.Request.Header.Set("Content-Type", "application/json")
+
+	handler.Save()(c)
+	assert.Equal(t, http.StatusCreated, w.Code)
+	mockservice.AssertCalled(t, "Save", expectedUser)
+}
+
+
+func TestSaveUser_Error(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockservice := new(MockService)
+	handler := New(mockservice)
+	expectedUser := domain.User{
+		Name:     "testemail",
+		Email:    "test@email.com",
+		Age:      20,
+		Password: "12345678",
+	}
+
+	mockservice.On("Save", expectedUser).Return(domain.User{}, domain.ErrUserCannotSave)
+
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+
+	jsonBody := []byte(`{"name":"testemail","email":"test@email.com","age":20,"password":"12345678"}`)
+	c.Request, _ = http.NewRequest(http.MethodPost, "/v1/user", bytes.NewBuffer(jsonBody))
+	c.Request.Header.Set("Content-Type", "application/json")
+
+	handler.Save()(c)
+	assert.Equal(t, http.StatusFailedDependency, w.Code)
+	mockservice.AssertCalled(t, "Save", expectedUser)
+}
+
+func TestSaveUser_ErrorValidation(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockservice := new(MockService)
+	handler := New(mockservice)
+	expectedUser := domain.User{
+		Name:     "testemail",
+		Email:    "testErrorValidate",
+		Age:      20,
+		Password: "12345678",
+	}
+
+	mockservice.On("Save", expectedUser).Return(expectedUser, domain.ErrValidationUser)
+
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+
+	jsonBody := []byte(`{"name":"testemail","email":"testErrorValidate","age":20,"password":"12345678"}`)
+	c.Request, _ = http.NewRequest(http.MethodPost, "/v1/user", bytes.NewBuffer(jsonBody))
+	c.Request.Header.Set("Content-Type", "application/json")
+
+	handler.Save()(c)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestSaveUser_ErrorJson(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockservice := new(MockService)
+	handler := New(mockservice)
+	expectedUser := domain.User{
+		Name:     "testemail",
+		Age:      20,
+		Email:    "test@email.com",
+		Password: "12345678",
+	}
+
+	mockservice.On("Save", expectedUser).Return(domain.User{}, ErrUnmarshalBody)
+
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+
+	jsonBody := []byte(`{"name":"testemail",Edad:20,"email":"test@email.com","password":"12345678"}`)
+	c.Request, _ = http.NewRequest(http.MethodPost, "/v1/user", bytes.NewBuffer(jsonBody))
+	c.Request.Header.Set("Content-Type", "application/json")
+
+	handler.Save()(c)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 
 func TestGetUserByID_Error(t *testing.T) {
@@ -105,9 +211,74 @@ func TestGetUserByEmail_ErrorDuplicate(t *testing.T) {
 	c.Params = gin.Params{{Key: "email", Value: "test@email.com"}}
 
 	handler.GetUserByEmail()(c)
-
 	assert.Equal(t, http.StatusAlreadyReported, w.Code)
-	//assert.Equal(t,expecteduser.Email,actualUser.Email)
+
+}
+
+func TestLogin_Success(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockservice := new(MockService)
+	handler := New(mockservice)
+
+	expecteduser := &domain.User{
+		Email:    "test@email.com",
+		Password: "testpassword",
+	}
+	mockservice.On("Login", expecteduser).Return(expecteduser, "test-token", nil)
+
+	jsonBody := []byte(`{"email": "test@email.com", "password": "testpassword"}`)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	req, err := http.NewRequest("POST", "/v1/user/login", io.NopCloser(bytes.NewBuffer(jsonBody)))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	c.Request = req
+
+	handler.Login()(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var response map[string]interface{}
+	if err := json.Unmarshal(w.Body.Bytes(), &response); err != nil {
+		t.Fatal("Error al parsear la respuesta:", err)
+	}
+	assert.Equal(t, "test@email.com", response["email"])
+	assert.Equal(t, "test-token", response["token"])
+}
+
+func TestLogin_Error(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockservice := new(MockService)
+	handler := New(mockservice)
+
+	expecteduser := &domain.User{
+		Email:    "test@email.com",
+		Password: "testpassword",
+	}
+	mockservice.On("Login", expecteduser).Return(nil, "", domain.ErrUserCannotFound)
+
+	jsonBody := []byte(`{"email": "test@email.com", "password": "testpassword"}`)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	req, err := http.NewRequest("POST", "/v1/user/login", io.NopCloser(bytes.NewBuffer(jsonBody)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	c.Request = req
+
+	handler.Login()(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
 }
 
 func TestSave_Success(t *testing.T) {

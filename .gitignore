@@ -34,3 +34,5 @@ vendor/
 # Archivos de configuración local
 .env
 .env.local
+.vscode/
+```

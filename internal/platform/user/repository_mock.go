@@ -6,7 +6,6 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 )
 
-// solo el molde
 type MockDB struct {
 	DB   *sql.DB
 	Mock sqlmock.Sqlmock

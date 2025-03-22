@@ -18,10 +18,9 @@ func New(service domain.Service) *handler {
 	}
 }
 
-
 func (h handler) GetUserByEmail() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		email:=c.Param("email")
+		email := c.Param("email")
 
 		user, err := h.service.GetUserByEmail(email) // Usa una función del servicio para obtener el usuario por su email
 		if err != nil {
@@ -75,5 +74,38 @@ func (h handler) Save() func(c *gin.Context) {
 			Email: user.Email,
 		}
 		c.JSON(http.StatusCreated, response)
+	}
+}
+
+func (h handler) Login() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var userLogin UserLogin
+		err := c.BindJSON(&userLogin)
+		if err != nil {
+			h.HandleError(c, ErrUnmarshalBody)
+			return
+		}
+
+		err = userLogin.Validate()
+		if err != nil {
+			h.HandleError(c, ErrValidationUser)
+			return
+		}
+
+		user, token, err := h.service.Login(userLogin.ToDomain())
+		if err != nil {
+			h.HandleError(c, err)
+			return
+		}
+
+		response := LoginResponse{
+			ID:    user.ID,
+			Name:  user.Name,
+			Age:   user.Age,
+			Email: user.Email,
+			Token: token,
+		}
+
+		c.JSON(http.StatusOK, response)
 	}
 }

@@ -1,10 +1,8 @@
 package user
 
 import (
-	"crypto/sha256"
-	"encoding/base64"
-
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -19,8 +17,11 @@ func (u *User) setID() {
 	u.ID = uuid.New().String()
 }
 
-func (u *User) hashPassword() {
-	hasher := sha256.New()
-	hasher.Write([]byte(u.Password))
-	u.Password = base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+func (u *User) hashPassword() error {
+	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	u.Password = string(hash)
+	return nil
 }
