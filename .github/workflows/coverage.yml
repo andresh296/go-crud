@@ -12,7 +12,9 @@ jobs:
     steps:
       # Paso 1: Check out el código
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+         ref: ${{ github.event.pull_request.head.sha }}
 
       # Paso 2: Configurar Go
       - name: Set up Go
