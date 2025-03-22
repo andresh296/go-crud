@@ -29,12 +29,12 @@ func (u UserRequest) Validate() error {
 	if err != nil {
 		validateErrors := err.(validator.ValidationErrors)
 		message := ""
-		
+
 		for _, validateErr := range validateErrors {
 			message += fmt.Sprintf("%s: %s,", validateErr.Field(), validateErr.Error())
 		}
 
-		return fmt.Errorf(ErrValidationUser.Error(),message)
+		return fmt.Errorf("%w, %s",ErrValidationUser,message)
 
 		}
 		return nil
