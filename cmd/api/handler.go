@@ -58,7 +58,7 @@ func (h handler) Save() func(c *gin.Context) {
 
 		err = userRequest.Validate()
 		if err != nil {
-			h.HandleError(c, err)
+			h.HandleError(c, ErrValidationUser)
 			return
 		}
 
