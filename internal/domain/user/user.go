@@ -6,11 +6,11 @@ import (
 )
 
 type User struct {
-	ID string 
-	Name string 
-	Age int8 
-	Email string 
-	Password string 
+	ID       string
+	Name     string
+	Age      int8
+	Email    string
+	Password string
 }
 
 func (u *User) setID() {
