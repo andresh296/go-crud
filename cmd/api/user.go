@@ -9,15 +9,17 @@ import (
 )
 
 type UserRequest struct {
-	Name     string `json:"name" validate:"required,max=100"`
-	Age      int8   `json:"age" validate:"required,gte=18"`
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8"`
+	Name     string 
+	Age      int8   
+	Email    string 
+	Password string 
 }
 
+
+
 type UserLogin struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8"`
+	Email    string 
+	Password string 
 }
 
 type LoginResponse struct {
