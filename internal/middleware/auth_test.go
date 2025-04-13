@@ -33,7 +33,7 @@ func setupTest() (*gin.Engine, config.JWTConfig) {
 func TestJWTAuthMiddleware_MissingToken(t *testing.T) {
 	r, _ := setupTest()
 
-	// Crear request sin token
+	
 	req := httptest.NewRequest(http.MethodGet, "/test", nil)
 	w := httptest.NewRecorder()
 

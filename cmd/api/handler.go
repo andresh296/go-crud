@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 
 	domain "github.com/andresh296/go-crud/internal/domain/user"
@@ -22,7 +23,7 @@ func (h handler) GetUserByEmail() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		email := c.Param("email")
 
-		user, err := h.service.GetUserByEmail(email) // Usa una función del servicio para obtener el usuario por su email
+		user, err := h.service.GetUserByEmail(email)
 		if err != nil {
 			h.HandleError(c, err)
 			return
@@ -47,50 +48,64 @@ func (h handler) GetByID() func(c *gin.Context) {
 }
 
 func (h handler) Save() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		var userRequest UserRequest
-		err := c.BindJSON(&userRequest)
-		if err != nil {
-			h.HandleError(c, ErrUnmarshalBody)
-			return
-		}
+    return func(c *gin.Context) {
+        data, exists := c.Get("validatedData")
+        if !exists {
+            h.HandleError(c, ErrInvalidJSONFormat)
+            return
+        }
 
-		err = userRequest.Validate()
-		if err != nil {
-			h.HandleError(c, ErrValidationUser)
-			return
-		}
+		jsonBytes, err := json.Marshal(data)
+        if err != nil {
+            h.HandleError(c, ErrUnmarshalBody)
+            return
+        }
 
-		user, err := h.service.Save(userRequest.ToDomain())
-		if err != nil {
-			h.HandleError(c, err)
-			return
-		}
+        var userRequest UserRequest 
+        if err := json.Unmarshal(jsonBytes, &userRequest); err != nil {
+            h.HandleError(c, ErrUnmarshalBody)
+            return
+        }
+       
 
-		response := UserResponse{
-			ID:    user.ID,
-			Name:  user.Name,
-			Age:   user.Age,
-			Email: user.Email,
-		}
-		c.JSON(http.StatusCreated, response)
-	}
+        user, err := h.service.Save(userRequest.ToDomain())
+        if err != nil {
+            h.HandleError(c, err)
+            return
+        }
+
+        response := UserResponse{
+            ID:    user.ID,
+            Name:  user.Name,
+            Age:   user.Age,
+            Email: user.Email,
+        }
+        c.JSON(http.StatusCreated, response)
+    }
 }
 
 func (h handler) Login() func(c *gin.Context) {
 	return func(c *gin.Context) {
+
+		data, exists := c.Get("validatedData")
+        if !exists {
+            h.HandleError(c, ErrInvalidJSONFormat)
+            return
+        }
+
 		var userLogin UserLogin
-		err := c.BindJSON(&userLogin)
+		jsonBytes, err := json.Marshal(data)
 		if err != nil {
 			h.HandleError(c, ErrUnmarshalBody)
 			return
 		}
 
-		err = userLogin.Validate()
-		if err != nil {
-			h.HandleError(c, ErrValidationUser)
+		if err := json.Unmarshal(jsonBytes, &userLogin); err != nil {
+			h.HandleError(c, ErrUnmarshalBody)
 			return
 		}
+
+	
 
 		user, token, err := h.service.Login(userLogin.ToDomain())
 		if err != nil {

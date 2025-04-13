@@ -33,6 +33,7 @@ func NewValidator() (*Validators, error) {
 
 func createSchema(resource string) (*jsonschema.Schema, error) {
 	compiler := jsonschema.NewCompiler()
+	compiler.AssertFormat = true
 	schemaJSON, err := readJsonSchema(resource)
 	if err != nil {
 		return nil, err
