@@ -21,6 +21,11 @@ func TestGetUserByEmail_Error(t *testing.T) {
 	mockservice := new(MockService)
 	handler := New(mockservice)
 
+
+
+
+
+	
 	expecteduser := &domain.User{}
 
 	mockservice.On("GetUserByEmail", "test@email.com").Return(expecteduser, domain.ErrGettingUserByEmail)

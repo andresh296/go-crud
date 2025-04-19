@@ -55,10 +55,7 @@ func (u UserLogin) ToDomain() domain.User {
 // 	validate := validator.New()
 // 	err := validate.Struct(u)
 // 	if err != nil {
-// 		validateErrors := err.(validator.ValidationErrors)
-// 		message := ""
-
-// 		for _, validateErr := range validateErrors {
+// 		validateuserLoginlidateErr := range validateErrors {
 // 			message += fmt.Sprintf("%s: %s,", validateErr.Field(), validateErr.Error())
 // 		}
 
