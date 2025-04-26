@@ -12,7 +12,7 @@ func routing(app *gin.Engine, dependencies *Dependencies) {
 	userService := domain.NewService(dependencies.userRepo)
 	handler := New(userService)
 
-	validators, err := schema.NewValidator()
+	validators, err := schema.NewValidator(&schema.DefaultFileReader{})
 	if err != nil {
 		panic(err)
 	}
