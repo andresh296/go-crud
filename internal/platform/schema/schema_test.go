@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/test-go/testify/assert"
-	"github.com/test-go/testify/mock"
 )
 
 func TestNewValidator_MockConfiguration(t *testing.T) {
@@ -48,7 +47,7 @@ func TestNewValidator(t *testing.T) {
 func TestNewValidator_ErrorReadingSchema(t *testing.T) {
     // Configurar el mock para devolver un error
     mockReader := new(FileReaderMock)
-    mockReader.On("ReadJsonSchema", mock.Anything).Return([]byte{}, errors.New("error leyendo un esquema"))
+    mockReader.On("ReadJsonSchema", "login_schema.json").Return([]byte{}, errors.New("error leyendo un esquema"))
 
 
     // Reemplazar la variable fileReader con el mock

@@ -10,6 +10,8 @@ import (
 	"github.com/kaptinlin/jsonschema"
 )
 
+var fileReader FileReaderInterface = &DefaultFileReader{}
+
 type Validators struct {
 	LoginValidator *jsonschema.Schema
 	RegisterValidator *jsonschema.Schema
@@ -21,13 +23,25 @@ type FileReaderInterface interface {
 
 type DefaultFileReader struct{}
 
-var fileReader FileReaderInterface = &DefaultFileReader{}
+func (r *DefaultFileReader) ReadJsonSchema(resource string) ([]byte, error) {
+	root, err := utils.FindModuleRoot()
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := os.Open(filepath.Join(root, "internal/platform/schema/json_schemas", resource))
+	if err != nil {
+		return nil, err
+	}
+	defer data.Close()
+
+	return io.ReadAll(data)
+}
+
 
 func SetFileReader(reader FileReaderInterface) {
 	fileReader = reader
 }
-
-
 
 func NewValidator() (*Validators, error) {
 	login, err := createSchema("login_schema.json")
@@ -62,20 +76,4 @@ func createSchema(resource string) (*jsonschema.Schema, error) {
     }
 
     return schema, nil
-}
-
-
-func (r *DefaultFileReader) ReadJsonSchema(resource string) ([]byte, error) {
-	root, err := utils.FindModuleRoot()
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := os.Open(filepath.Join(root, "internal/platform/schema/json_schemas", resource))
-	if err != nil {
-		return nil, err
-	}
-	defer data.Close()
-
-	return io.ReadAll(data)
 }
