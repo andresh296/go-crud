@@ -10,9 +10,8 @@ import (
 	"github.com/kaptinlin/jsonschema"
 )
 
-var fileReader FileReaderInterface = &DefaultFileReader{}
-
 type Validators struct {
+	FileReader 	 FileReaderInterface
 	LoginValidator *jsonschema.Schema
 	RegisterValidator *jsonschema.Schema
 }
@@ -38,32 +37,31 @@ func (r *DefaultFileReader) ReadJsonSchema(resource string) ([]byte, error) {
 	return io.ReadAll(data)
 }
 
+func NewValidator(fileReader FileReaderInterface) (*Validators, error) {
+	validator := &Validators{
+		FileReader: fileReader,
+	}
 
-func SetFileReader(reader FileReaderInterface) {
-	fileReader = reader
-}
-
-func NewValidator() (*Validators, error) {
-	login, err := createSchema("login_schema.json")
+	login, err := validator.createSchema("login_schema.json")
 	if err != nil {
 		return nil, err
 	}
 
-	register, err := createSchema("register_schema.json")
+	register, err := validator.createSchema("register_schema.json")
 	if err != nil {
 		return nil, err
 	}
 
-	return &Validators{
-		LoginValidator:    login,
-		RegisterValidator: register,
-	}, nil
+	validator.LoginValidator = login
+	validator.RegisterValidator = register
+
+	return validator, nil
 }
 
-func createSchema(resource string) (*jsonschema.Schema, error) {
+func (v *Validators) createSchema(resource string) (*jsonschema.Schema, error) {
 	compiler := jsonschema.NewCompiler()
 	compiler.AssertFormat = true
-	schemaJSON, err := fileReader.ReadJsonSchema(resource)
+	schemaJSON, err := v.FileReader.ReadJsonSchema(resource)
 	if err != nil {
 		return nil, errors.New("failed to read JSON schema: " + err.Error())
 	}
