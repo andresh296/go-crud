@@ -10,7 +10,7 @@ import (
 )
 
 func TestJsonValidator(t *testing.T) {
-    validators, err := schema.NewValidator()
+    validators, err := schema.NewValidator(&schema.DefaultFileReader{})
     assert.NoError(t, err)
     builder := NewMiddlewareValidator(validators)
 
