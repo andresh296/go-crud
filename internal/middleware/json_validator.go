@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
 
 	schema "github.com/andresh296/go-crud/internal/platform/schema"
 	"github.com/gin-gonic/gin"
@@ -31,9 +33,22 @@ func (b *Builder) WithValidateRegister() gin.HandlerFunc {
 
 func (b *Builder) jsonValidator(schema *jsonschema.Schema) gin.HandlerFunc {
     return func(c *gin.Context) {
-       
+
+        bodyBytes, err := io.ReadAll(c.Request.Body)
+        if err != nil {
+            c.JSON(400, gin.H{
+                "error": "invalid JSON format",
+            })
+            c.Abort()
+            return
+        }
+
+      
+        c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+
+      
         var data map[string]interface{}
-        if err := c.ShouldBindJSON(&data); err != nil {
+        if err := json.Unmarshal(bodyBytes, &data); err != nil {
             c.JSON(400, gin.H{
                 "error": "invalid JSON format",
             })
@@ -60,7 +75,7 @@ func (b *Builder) jsonValidator(schema *jsonschema.Schema) gin.HandlerFunc {
             return
         }
 
-        c.Set("validatedData", data)
+        
         c.Next()
     }
 }

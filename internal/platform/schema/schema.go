@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -14,6 +15,20 @@ type Validators struct {
 	RegisterValidator *jsonschema.Schema
 }
 
+type FileReaderInterface interface {
+	ReadJsonSchema(resource string) ([]byte, error)
+}
+
+type DefaultFileReader struct{}
+
+var fileReader FileReaderInterface = &DefaultFileReader{}
+
+func SetFileReader(reader FileReaderInterface) {
+	fileReader = reader
+}
+
+
+
 func NewValidator() (*Validators, error) {
 	login, err := createSchema("login_schema.json")
 	if err != nil {
@@ -26,7 +41,7 @@ func NewValidator() (*Validators, error) {
 	}
 
 	return &Validators{
-		LoginValidator:   login,
+		LoginValidator:    login,
 		RegisterValidator: register,
 	}, nil
 }
@@ -34,31 +49,33 @@ func NewValidator() (*Validators, error) {
 func createSchema(resource string) (*jsonschema.Schema, error) {
 	compiler := jsonschema.NewCompiler()
 	compiler.AssertFormat = true
-	schemaJSON, err := readJsonSchema(resource)
+	schemaJSON, err := fileReader.ReadJsonSchema(resource)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("failed to read JSON schema: " + err.Error())
 	}
-	schema, err := compiler.Compile(schemaJSON)
-	if err != nil {
-		return nil, err
-	}  
+	if schemaJSON == nil {
+		return nil, errors.New("schemaJSON is nil or empty")
+	}
+    schema, err := compiler.Compile(schemaJSON)
+    if err != nil {
+        return nil, err
+    }
 
-	return schema, nil
+    return schema, nil
 }
 
-func readJsonSchema(resource string)([]byte, error) {
+
+func (r *DefaultFileReader) ReadJsonSchema(resource string) ([]byte, error) {
 	root, err := utils.FindModuleRoot()
-
 	if err != nil {
 		return nil, err
 	}
 
-	data, err := os.Open(filepath.Join(root, "internal/platform/schema/json_schemas",resource))
-
+	data, err := os.Open(filepath.Join(root, "internal/platform/schema/json_schemas", resource))
 	if err != nil {
 		return nil, err
 	}
+	defer data.Close()
 
 	return io.ReadAll(data)
 }
-	
