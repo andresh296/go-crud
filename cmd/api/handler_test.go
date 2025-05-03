@@ -254,7 +254,7 @@ func TestLogin_Error(t *testing.T) {
 
 	handler.Login()(c)
 
-	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
 
 
