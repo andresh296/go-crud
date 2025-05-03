@@ -56,7 +56,8 @@ func (h handler) Save() func(c *gin.Context) {
 
         user, err := h.service.Save(userRequest.ToDomain())
         if err != nil {
-            h.HandleError(c, err)
+
+            h.HandleError(c, domain.ErrUserCannotSave)
             return
         }
 
@@ -80,7 +81,7 @@ func (h handler) Login() func(c *gin.Context) {
 
         user, token, err := h.service.Login(userLogin.ToDomain())
         if err != nil {
-            h.HandleError(c, err)
+            h.HandleError(c, ErrValidationUser)
             return
         }
 

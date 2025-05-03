@@ -1,8 +1,6 @@
 module github.com/andresh296/go-crud
 
-go 1.21.1
-
-toolchain go1.23.4
+go 1.23
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2

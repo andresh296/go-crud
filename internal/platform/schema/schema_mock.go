@@ -5,21 +5,14 @@ import (
 )
 
 
-type UtilsMock struct {
-	mock.Mock
-}
-
-func (m *UtilsMock) FindModuleRoot() (string, error) {
-	args := m.Called()
-	return args.String(0), args.Error(1)
-}
-
-
 type FileReaderMock struct {
 	mock.Mock
 }
 
 func (m *FileReaderMock) ReadJsonSchema(resource string) ([]byte, error) {
     args := m.Called(resource)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
     return args.Get(0).([]byte), args.Error(1)
 }

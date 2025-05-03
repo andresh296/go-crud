@@ -4,8 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	schema "github.com/andresh296/go-crud/internal/platform/schema" // Replace with the actual package path for schema
-
+	schema "github.com/andresh296/go-crud/internal/platform/schema" 
 	"github.com/test-go/testify/assert"
 )
 

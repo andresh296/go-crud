@@ -14,4 +14,6 @@ var (
 	ErrUserCannotLogin     = errors.New("error user can not login")
 	ErrValidationUser      = errors.New("error validation user")
 	ErrInvalidJson         = errors.New("error invalid json")
+	ErrGerateToken       = errors.New("error generate token")
+	
 )

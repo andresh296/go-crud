@@ -32,14 +32,11 @@ func TestNewValidator(t *testing.T) {
 
 
 func TestNewValidator_ErrorReadingSchema(t *testing.T) {
-    // Configurar el mock para devolver un error
     mockReader := new(FileReaderMock)
     mockReader.On("ReadJsonSchema", "login_schema.json").Return([]byte{}, errors.New("error leyendo un esquema"))
 
-    // Testear que se devuelva un error si no se puede leer el esquema de login
     _, err := NewValidator(mockReader)
     assert.NotNil(t, err)
 
-    // Verificar que el mock haya sido llamado correctamente
     mockReader.AssertExpectations(t)
 }

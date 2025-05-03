@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/andresh296/go-crud/config"
-	"github.com/andresh296/go-crud/internal/platform/token"
+	security "github.com/andresh296/go-crud/internal/platform/token"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -42,7 +42,7 @@ func (s service) Save(user User) (User, error) {
 	user.hashPassword()
 	err := s.repository.Save(user)
 	if err != nil {
-		return User{}, err
+		return User{}, ErrUserCannotSave
 	}
 
 	return user, nil
@@ -56,11 +56,11 @@ func (u User) comparePassword(password string) error {
 func (s service) Login(user User) (*User, string, error) {
 	userFound, err := s.GetUserByEmail(user.Email)
 	if err != nil {
-		return nil, "", err
+		return nil, "", ErrValidationUser
 	}
 
 	if err := userFound.comparePassword(user.Password); err != nil {
-		return nil, "", err
+		return nil, "", ErrValidationUser
 	}
 
 	cfg := config.Load()
@@ -72,7 +72,7 @@ func (s service) Login(user User) (*User, string, error) {
 	)
 
 	if err != nil {
-		return nil, "", err
+		return nil, "", ErrGerateToken
 	}
 
 	return userFound, token, nil

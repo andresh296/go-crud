@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"net/http"
 
 	schema "github.com/andresh296/go-crud/internal/platform/schema"
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,7 @@ import (
 
 type Builder struct {
 	Validators *schema.Validators
+    isLogin    bool 
 }
 
 
@@ -23,11 +25,13 @@ func NewMiddlewareValidator(validators *schema.Validators) *Builder {
 }
 
 func (b *Builder) WithValidateLogin() gin.HandlerFunc {
+    b.isLogin = true
 	return b.jsonValidator(b.Validators.LoginValidator)
 }
 
 
 func (b *Builder) WithValidateRegister() gin.HandlerFunc {
+    b.isLogin = false
 	return b.jsonValidator(b.Validators.RegisterValidator )
 }
 
@@ -35,11 +39,8 @@ func (b *Builder) jsonValidator(schema *jsonschema.Schema) gin.HandlerFunc {
     return func(c *gin.Context) {
 
         bodyBytes, err := io.ReadAll(c.Request.Body)
-        if err != nil {
-            c.JSON(400, gin.H{
-                "error": "invalid JSON format",
-            })
-            c.Abort()
+        if err != nil { 
+            ValidateError(c, ErrUnmarshalBody, nil, http.StatusBadRequest)
             return
         }
 
@@ -49,10 +50,7 @@ func (b *Builder) jsonValidator(schema *jsonschema.Schema) gin.HandlerFunc {
       
         var data map[string]interface{}
         if err := json.Unmarshal(bodyBytes, &data); err != nil {
-            c.JSON(400, gin.H{
-                "error": "invalid JSON format",
-            })
-            c.Abort()
+            ValidateError(c, ErrInvalidJSONFormat, nil, http.StatusBadRequest)
             return
         }
 
@@ -61,17 +59,18 @@ func (b *Builder) jsonValidator(schema *jsonschema.Schema) gin.HandlerFunc {
         if !result.IsValid() {
             details, err := json.MarshalIndent(result.ToList(), "", "  ")
             if err != nil {
-                c.JSON(500, gin.H{
-                    "error": "internal server error",
-                })
-                c.Abort()
+                ValidateError(c, ErrUnmarshalBody, nil, http.StatusBadRequest)
                 return
             }
-            c.JSON(400, gin.H{
-                "error": "validation failed",
-                "details": string(details),
-            })
-            c.Abort()
+            
+
+            var formattedErrors interface{}
+            if err := json.Unmarshal(details, &formattedErrors); err != nil {
+                ValidateError(c, ErrUnmarshalBody, nil, http.StatusBadRequest)
+                return
+            }
+            
+            ValidateError(c, ErrSchemaValidation, formattedErrors, http.StatusBadRequest)
             return
         }
 

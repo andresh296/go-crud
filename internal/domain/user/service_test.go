@@ -93,6 +93,7 @@ func TestSave_Success(t *testing.T) {
 	assert.Equal(t, expectedUser.Email, user.Email)
 }
 
+
 func TestSave_ErrorCannotSaveUser(t *testing.T) {
 	mockRepo := &mockRepository{}
 	expectedUser := User{
@@ -156,10 +157,11 @@ func TestLogin_Success(t *testing.T) {
 	assert.Equal(t, expectedUser.Email, user.Email)
 }
 
+
 func TestLogin_UserNotFound(t *testing.T) {
 	mockRepo := &mockRepository{}
 
-	mockRepo.On("GetUserByEmail", "email@test").Return(nil, ErrNotFoundUserByEmail)
+	mockRepo.On("GetUserByEmail", "email@test").Return(nil, ErrValidationUser)
 
 	service := NewService(mockRepo)
 	user, token, err := service.Login(User{
@@ -167,10 +169,11 @@ func TestLogin_UserNotFound(t *testing.T) {
 		Password: "12345",
 	})
 
-	assert.Equal(t, ErrNotFoundUserByEmail, err)
+	assert.Equal(t, ErrValidationUser, err)
 	assert.Nil(t, user)
 	assert.Empty(t, token)
 }
+
 
 func TestLogin_PasswordNotMatch(t *testing.T) {
 	mockRepo := &mockRepository{}
@@ -180,7 +183,7 @@ func TestLogin_PasswordNotMatch(t *testing.T) {
 	}
 	expectedUser.hashPassword()
 
-	mockRepo.On("GetUserByEmail", "email@test").Return(&expectedUser, ErrUserCannotLogin)
+	mockRepo.On("GetUserByEmail", "email@test").Return(&expectedUser, ErrValidationUser)
 
 	service := NewService(mockRepo)
 	user, token, err := service.Login(User{
@@ -188,7 +191,7 @@ func TestLogin_PasswordNotMatch(t *testing.T) {
 		Password: "123456",
 	})
 
-	assert.Equal(t, ErrUserCannotLogin, err)
+	assert.Equal(t, ErrValidationUser, err)
 	assert.Nil(t, user)
 	assert.Empty(t, token)
 }
