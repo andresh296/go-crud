@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "El nombre del usuario",
+      "maxLength": 100
+    },
+    "age": {
+      "type": "integer",
+      "description": "La edad del usuario",
+      "minimum": 18
+    },
+    "email": {
+      "type": "string",
+      "description": "El correo electrónico del usuario",
+      "format": "email"
+    },
+    "password": {
+      "type": "string",
+      "description": "La contraseña del usuario",
+      "minLength": 8
+    }
+  },
+  "required": ["name", "age", "email", "password"]
+}

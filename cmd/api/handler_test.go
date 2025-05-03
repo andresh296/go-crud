@@ -131,30 +131,6 @@ func TestSaveUser_Error(t *testing.T) {
 	mockservice.AssertCalled(t, "Save", expectedUser)
 }
 
-func TestSaveUser_ErrorValidation(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	mockservice := new(MockService)
-	handler := New(mockservice)
-	expectedUser := domain.User{
-		Name:     "testemail",
-		Email:    "testErrorValidate",
-		Age:      20,
-		Password: "12345678",
-	}
-
-	mockservice.On("Save", expectedUser).Return(expectedUser, domain.ErrValidationUser)
-
-	w := httptest.NewRecorder()
-
-	c, _ := gin.CreateTestContext(w)
-
-	jsonBody := []byte(`{"name":"testemail","email":"testErrorValidate","age":20,"password":"12345678"}`)
-	c.Request, _ = http.NewRequest(http.MethodPost, "/v1/user", bytes.NewBuffer(jsonBody))
-	c.Request.Header.Set("Content-Type", "application/json")
-
-	handler.Save()(c)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-}
 
 func TestSaveUser_ErrorJson(t *testing.T) {
 	gin.SetMode(gin.TestMode)
@@ -278,50 +254,20 @@ func TestLogin_Error(t *testing.T) {
 
 	handler.Login()(c)
 
-	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
 
-func TestSave_Success(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-
-	mockService := new(MockService)
-
-	handler := New(mockService)
-
-	expectedUser := domain.User{
-
-		Name:     "Emmanuel",
-		Email:    "emmago@gmail.com",
-		Age:      27,
-		Password: "123456789",
-	}
-
-	mockService.On("Save", expectedUser).Return(expectedUser, nil)
-
-	body := `{"name": "Emmanuel", "age": 27, "email": "emmago@gmail.com", "password": "123456789"}`
-	req := httptest.NewRequest(http.MethodPost, "/users", strings.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-
-	c.Request = req
-
-	handler.Save()(c)
-	assert.Equal(t, http.StatusCreated, w.Code)
-
-}
 
 func TestSave_error(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	// Crear un mock del servicio
+	
 	mockService := new(MockService)
 
-	// Crear el handler con el mock
+
 	handler := New(mockService)
 
-	// Datos esperados de usuario después de guardarse
+	
 	expectedUser := domain.User{
 
 		Name:     "Emmanuel",
@@ -346,60 +292,3 @@ func TestSave_error(t *testing.T) {
 
 }
 
-func TestSave_errorValidate(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-
-	mockService := new(MockService)
-	handler := New(mockService)
-
-	expectedUser := domain.User{
-
-		Name:     "Emmanuel",
-		Email:    "testValidate.com",
-		Age:      27,
-		Password: "123456789",
-	}
-
-	mockService.On("Save", expectedUser).Return(expectedUser, domain.ErrValidationUser)
-
-	body := `{"name": "Emmanuel", "age": 27, "email": "testValidate.com", "password": "123456789"}`
-	req := httptest.NewRequest(http.MethodPost, "/users", strings.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-
-	c.Request = req
-	handler.Save()(c)
-
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-}
-
-func TestSave_errorJson(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-
-	mockService := new(MockService)
-	handler := New(mockService)
-
-	expectedUser := domain.User{
-		Name:     "Emmanuel",
-		Email:    "emmago@gmail.com",
-		Password: "123456789",
-	}
-
-	mockService.On("Save", expectedUser).Return(domain.User{}, ErrUnmarshalBody)
-
-	body := `{"name": "Emmanuel", edad:20, "email": "emmago@gmail.com", "password": "123456789"}`
-	req := httptest.NewRequest(http.MethodPost, "/users", strings.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-
-	c.Request = req
-
-	handler.Save()(c)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-}

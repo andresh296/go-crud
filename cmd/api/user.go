@@ -1,23 +1,21 @@
 package api
 
 import (
-	"fmt"
-
 	domain "github.com/andresh296/go-crud/internal/domain/user"
-
-	"github.com/go-playground/validator/v10"
 )
 
 type UserRequest struct {
-	Name     string `json:"name" validate:"required,max=100"`
-	Age      int8   `json:"age" validate:"required,gte=18"`
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8"`
+	Name     string `json:"name"`
+	Age      int8   `json:"age"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
+
+
 type UserLogin struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type LoginResponse struct {
@@ -53,35 +51,32 @@ func (u UserLogin) ToDomain() domain.User {
 	}
 }
 
-func (u UserRequest) Validate() error {
-	validate := validator.New()
-	err := validate.Struct(u)
-	if err != nil {
-		validateErrors := err.(validator.ValidationErrors)
-		message := ""
+// func (u UserRequest) Validate() error {
+// 	validate := validator.New()
+// 	err := validate.Struct(u)
+// 	if err != nil {
+// 		validateuserLoginlidateErr := range validateErrors {
+// 			message += fmt.Sprintf("%s: %s,", validateErr.Field(), validateErr.Error())
+// 		}
 
-		for _, validateErr := range validateErrors {
-			message += fmt.Sprintf("%s: %s,", validateErr.Field(), validateErr.Error())
-		}
-
-		return fmt.Errorf("%w: %s", ErrValidationUser, message)
-	}
-	return nil
-}
+// 		return fmt.Errorf("%w: %s", ErrValidationUser, message)
+// 	}
+// 	return nil
+// }
 
 
 
-func (u UserLogin) Validate() error {
-	validate := validator.New()
-	err := validate.Struct(u)
-	if err != nil {
-		validateErrors := err.(validator.ValidationErrors)
-		message := ""
+// func (u UserLogin) Validate() error {
+// 	validate := validator.New()
+// 	err := validate.Struct(u)
+// 	if err != nil {
+// 		validateErrors := err.(validator.ValidationErrors)
+// 		message := ""
 
-		for _, validateErr := range validateErrors {
-			message += fmt.Sprintf("%s: %s,", validateErr.Field(), validateErr.Error())
-		}
-		return fmt.Errorf(ErrValidationUser.Error(), message)
-	}
-	return nil
-}
+// 		for _, validateErr := range validateErrors {
+// 			message += fmt.Sprintf("%s: %s,", validateErr.Field(), validateErr.Error())
+// 		}
+// 		return fmt.Errorf(ErrValidationUser.Error(), message)
+// 	}
+// 	return nil
+// }

@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	domain "github.com/andresh296/go-crud/internal/domain/user"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +21,7 @@ func (h handler) GetUserByEmail() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		email := c.Param("email")
 
-		user, err := h.service.GetUserByEmail(email) // Usa una función del servicio para obtener el usuario por su email
+		user, err := h.service.GetUserByEmail(email)
 		if err != nil {
 			h.HandleError(c, err)
 			return
@@ -47,65 +46,53 @@ func (h handler) GetByID() func(c *gin.Context) {
 }
 
 func (h handler) Save() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		var userRequest UserRequest
-		err := c.BindJSON(&userRequest)
-		if err != nil {
-			h.HandleError(c, ErrUnmarshalBody)
+    return func(c *gin.Context) {
+        var userRequest UserRequest
+		if err := c.ShouldBindJSON(&userRequest); err != nil {
+			h.HandleError(c, ErrInvalidJSONFormat)
 			return
 		}
+       
 
-		err = userRequest.Validate()
-		if err != nil {
-			h.HandleError(c, ErrValidationUser)
-			return
-		}
+        user, err := h.service.Save(userRequest.ToDomain())
+        if err != nil {
 
-		user, err := h.service.Save(userRequest.ToDomain())
-		if err != nil {
-			h.HandleError(c, err)
-			return
-		}
+            h.HandleError(c, domain.ErrUserCannotSave)
+            return
+        }
 
-		response := UserResponse{
-			ID:    user.ID,
-			Name:  user.Name,
-			Age:   user.Age,
-			Email: user.Email,
-		}
-		c.JSON(http.StatusCreated, response)
-	}
+        response := UserResponse{
+            ID:    user.ID,
+            Name:  user.Name,
+            Age:   user.Age,
+            Email: user.Email,
+        }
+        c.JSON(http.StatusCreated, response)
+    }
 }
 
 func (h handler) Login() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		var userLogin UserLogin
-		err := c.BindJSON(&userLogin)
-		if err != nil {
-			h.HandleError(c, ErrUnmarshalBody)
-			return
-		}
+    return func(c *gin.Context) {
+        var userLogin UserLogin
+        if err := c.ShouldBindJSON(&userLogin); err != nil {
+            h.HandleError(c, ErrInvalidJSONFormat)
+            return
+        }
 
-		err = userLogin.Validate()
-		if err != nil {
-			h.HandleError(c, ErrValidationUser)
-			return
-		}
+        user, token, err := h.service.Login(userLogin.ToDomain())
+        if err != nil {
+            h.HandleError(c, ErrValidationUser)
+            return
+        }
 
-		user, token, err := h.service.Login(userLogin.ToDomain())
-		if err != nil {
-			h.HandleError(c, err)
-			return
-		}
+        response := LoginResponse{
+            ID:    user.ID,
+            Name:  user.Name,
+            Age:   user.Age,
+            Email: user.Email,
+            Token: token,
+        }
 
-		response := LoginResponse{
-			ID:    user.ID,
-			Name:  user.Name,
-			Age:   user.Age,
-			Email: user.Email,
-			Token: token,
-		}
-
-		c.JSON(http.StatusOK, response)
-	}
+        c.JSON(http.StatusOK, response)
+    }
 }

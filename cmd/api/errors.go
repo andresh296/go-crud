@@ -10,7 +10,10 @@ import (
 
 var (
 	ErrUnmarshalBody  = errors.New("error unmarshal request body")
-	ErrValidationUser = errors.New("error validation user: %w")
+	ErrValidationUser = errors.New("error validation user")
+	ErrInvalidJSONFormat = errors.New("invalid JSON format")
+    ErrSchemaValidation  = errors.New("schema validation failed")
+	
 )
 
 type WebError struct {
@@ -27,11 +30,23 @@ func (h handler) HandleError(c *gin.Context, err error) {
 		})
 		return
 	case errors.Is(err, ErrValidationUser):
-		c.JSON(http.StatusBadRequest, WebError{
-			Status:  http.StatusBadRequest,
+		c.JSON(http.StatusUnauthorized, WebError{
+			Status:  http.StatusUnauthorized,
 			Message: err.Error(),
 		})
 		return
+	case errors.Is(err, ErrInvalidJSONFormat):
+        c.JSON(http.StatusBadRequest, WebError{
+            Status:  http.StatusBadRequest,
+            Message: err.Error(),
+        })
+        return
+    case errors.Is(err, ErrSchemaValidation):
+        c.JSON(http.StatusBadRequest, WebError{
+            Status:  http.StatusBadRequest,
+            Message: err.Error(),
+        })
+        return
 	case errors.Is(err, domain.ErrUserCannotSave):
 		c.JSON(http.StatusFailedDependency, WebError{
 			Status:  http.StatusFailedDependency,
